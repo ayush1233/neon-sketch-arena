@@ -1,0 +1,906 @@
+/* =============================================
+   🎮 NEON SKETCH ARENA — Game Design System
+   Pixel Art × Neon Arcade × 21st.dev Effects
+   Fonts: Press Start 2P (pixel) + Outfit (display)
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Press+Start+2P&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ---- Core Palette ---- */
+  --bg: #0a0a14;
+  --bg-deep: #060610;
+  --surface-1: rgba(16, 16, 32, 0.9);
+  --surface-2: rgba(22, 22, 44, 0.95);
+  --surface-3: rgba(30, 30, 60, 0.85);
+
+  /* ---- Neon Colors ---- */
+  --purple: #a855f7;
+  --purple-light: #c084fc;
+  --purple-dark: #7c3aed;
+  --cyan: #06b6d4;
+  --cyan-light: #38bdf8;
+  --pink: #ec4899;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+
+  /* ---- Game-Specific Colors ---- */
+  --xp-gold: #ffd700;
+  --health-red: #ff3333;
+  --mana-blue: #4488ff;
+  --rare-green: #55ff55;
+  --legendary-purple: #bf5af2;
+
+  /* ---- Text ---- */
+  --text: #e8e4f5;
+  --text-muted: #7a7a9e;
+  --text-bright: #ffffff;
+
+  /* ---- Pixel border colors ---- */
+  --pixel-border-light: rgba(255, 255, 255, 0.25);
+  --pixel-border-dark: rgba(0, 0, 0, 0.6);
+  --pixel-border-accent: var(--purple);
+
+  /* ---- Gradients ---- */
+  --grad-primary: linear-gradient(135deg, var(--purple), var(--cyan));
+  --grad-gold: linear-gradient(135deg, #ffd700, #ff8c00);
+  --grad-danger: linear-gradient(135deg, #ef4444, #dc2626);
+
+  /* ---- Pixel size unit ---- */
+  --px: 3px;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+/* ---- Scanline overlay (CRT effect) ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ---- Vignette overlay ---- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  pointer-events: none;
+  z-index: 9997;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Outfit', sans-serif;
+}
+
+input, select {
+  font-family: 'Press Start 2P', monospace;
+}
+
+button {
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* ===========================================================
+   PIXEL BORDER — Minecraft-style stepped 3D border
+   =========================================================== */
+.pixel-border {
+  position: relative;
+  border: var(--px) solid var(--pixel-border-dark);
+  box-shadow:
+    inset var(--px) var(--px) 0 var(--pixel-border-light),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.3),
+    0 0 12px rgba(168, 85, 247, 0.15);
+}
+
+.pixel-border-glow {
+  position: relative;
+  border: var(--px) solid var(--purple);
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(168, 85, 247, 0.3),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(168, 85, 247, 0.4),
+    0 0 40px rgba(168, 85, 247, 0.15);
+}
+
+/* ===========================================================
+   GAME PANEL — Replaces .glass with opaque game-style panel
+   =========================================================== */
+.game-panel {
+  background: var(--surface-2);
+  border: var(--px) solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(168, 85, 247, 0.1);
+}
+
+/* Legacy .glass — keep for backward compat but darken it */
+.glass {
+  background: var(--surface-1);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.06),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.glass-2 {
+  background: var(--surface-2);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.06),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Legacy gradient-border — enhance with game feel */
+.gradient-border {
+  position: relative;
+  border-radius: 0;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(168, 85, 247, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* ===========================================================
+   PIXEL BUTTONS — Minecraft-style raised buttons
+   =========================================================== */
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #5a5a6e 0%, #3a3a4e 50%, #2a2a3e 100%);
+  color: var(--text-bright);
+  border: var(--px) solid #1a1a2e;
+  padding: 14px 28px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(255, 255, 255, 0.2),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #111122,
+    0 6px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.08s, box-shadow 0.08s;
+  position: relative;
+}
+.pixel-btn:hover {
+  background: linear-gradient(180deg, #6a6a7e 0%, #4a4a5e 50%, #3a3a4e 100%);
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(255, 255, 255, 0.25),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #111122,
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(168, 85, 247, 0.4);
+  transform: translateY(-1px);
+}
+.pixel-btn:active {
+  background: linear-gradient(180deg, #2a2a3e 0%, #3a3a4e 50%, #4a4a5e 100%);
+  box-shadow:
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(255, 255, 255, 0.1),
+    inset var(--px) var(--px) 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 #111122;
+  transform: translateY(3px);
+}
+.pixel-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: grayscale(0.5);
+}
+
+/* Primary variant - purple accent */
+.pixel-btn-primary {
+  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+  border-color: #3b0f7a;
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(196, 132, 252, 0.3),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #2d0a5e,
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(168, 85, 247, 0.3);
+}
+.pixel-btn-primary:hover {
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(196, 132, 252, 0.4),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #2d0a5e,
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    0 0 35px rgba(168, 85, 247, 0.6);
+}
+
+/* Cyan variant */
+.pixel-btn-cyan {
+  background: linear-gradient(180deg, #0891b2 0%, #0e7490 50%, #155e75 100%);
+  border-color: #0c4a5e;
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(56, 189, 248, 0.3),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #082f3a,
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(6, 182, 212, 0.3);
+}
+.pixel-btn-cyan:hover {
+  background: linear-gradient(180deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(56, 189, 248, 0.4),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #082f3a,
+    0 6px 12px rgba(0, 0, 0, 0.5),
+    0 0 35px rgba(6, 182, 212, 0.6);
+}
+
+/* Danger variant */
+.pixel-btn-danger {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+  border-color: #7f1d1d;
+  box-shadow:
+    inset var(--px) var(--px) 0 rgba(252, 165, 165, 0.2),
+    inset calc(var(--px) * -1) calc(var(--px) * -1) 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #5a1010,
+    0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Legacy btn classes — restyle to pixel */
+.btn-primary {
+  background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+  color: white;
+  border: var(--px) solid #3b0f7a;
+  padding: 12px 24px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 2px 2px 0 rgba(196, 132, 252, 0.3),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    0 4px 0 #2d0a5e,
+    0 0 15px rgba(168, 85, 247, 0.3);
+  transition: transform 0.08s, box-shadow 0.08s;
+  border-radius: 0;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 2px 2px 0 rgba(196, 132, 252, 0.4),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+    0 5px 0 #2d0a5e,
+    0 0 30px rgba(168, 85, 247, 0.5);
+}
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset -2px -2px 0 rgba(196, 132, 252, 0.2),
+    inset 2px 2px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 #2d0a5e;
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: grayscale(0.5);
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, #3a3a4e 0%, #2a2a3e 100%);
+  color: var(--text);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.08s;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+}
+.btn-secondary:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: 2px solid #7f1d1d;
+  padding: 8px 16px;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+  box-shadow: inset 1px 1px 0 rgba(252, 165, 165, 0.2), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+}
+.btn-danger:hover {
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.5), inset 1px 1px 0 rgba(252, 165, 165, 0.3);
+}
+
+/* ===========================================================
+   PIXEL INPUTS — Game-style text fields
+   =========================================================== */
+.input {
+  background: var(--bg-deep);
+  color: var(--text);
+  border: var(--px) solid rgba(255, 255, 255, 0.12);
+  padding: 12px 14px;
+  font-size: 11px;
+  font-family: 'Press Start 2P', monospace;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 0, 0, 0.4),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 0;
+}
+.input::placeholder {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.input:focus {
+  border-color: var(--cyan);
+  box-shadow:
+    inset 2px 2px 0 rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(6, 182, 212, 0.4),
+    0 0 30px rgba(6, 182, 212, 0.15);
+}
+
+/* ===========================================================
+   NEON GLOW — Reusable glow effect
+   =========================================================== */
+.neon-glow {
+  text-shadow:
+    0 0 7px currentColor,
+    0 0 15px currentColor,
+    0 0 30px currentColor;
+}
+
+.neon-glow-box {
+  box-shadow:
+    0 0 10px rgba(168, 85, 247, 0.4),
+    0 0 25px rgba(168, 85, 247, 0.2),
+    inset 0 0 10px rgba(168, 85, 247, 0.1);
+}
+
+/* ===========================================================
+   XP BAR — Animated progress bar
+   =========================================================== */
+.xp-bar {
+  width: 100%;
+  height: 16px;
+  background: var(--bg-deep);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: var(--grad-primary);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    0 0 10px rgba(168, 85, 247, 0.5);
+  transition: width 0.5s ease-out;
+  position: relative;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent);
+}
+
+/* ===========================================================
+   GAME LABEL — Pixel font label used throughout
+   =========================================================== */
+.game-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ===========================================================
+   SCORE FLOAT — Points animation
+   =========================================================== */
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  80%  { opacity: 1; transform: translateY(-50px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-70px) scale(0.8); }
+}
+.score-float {
+  position: absolute;
+  pointer-events: none;
+  color: var(--xp-gold);
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 800;
+  font-size: 14px;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.8),
+    2px 2px 0 rgba(0, 0, 0, 0.5);
+  animation: floatUp 1.5s ease-out forwards;
+  z-index: 100;
+}
+
+/* ===========================================================
+   CONFETTI — Pixel-style
+   =========================================================== */
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+.confetti-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 0 !important; /* pixel squares */
+  pointer-events: none;
+  z-index: 9999;
+  animation: confettiFall linear forwards;
+  image-rendering: pixelated;
+}
+
+/* ===========================================================
+   CANVAS ACTIVE — Neon pulse on drawing canvas
+   =========================================================== */
+@keyframes neonPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 5px rgba(168, 85, 247, 0.05); }
+  50%       { box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), inset 0 0 15px rgba(168, 85, 247, 0.1), 0 0 60px rgba(168, 85, 247, 0.3); }
+}
+.canvas-active {
+  animation: neonPulse 2s ease-in-out infinite;
+  border: var(--px) solid var(--purple) !important;
+}
+
+/* ===========================================================
+   TIMER WARNING — Pulse when low
+   =========================================================== */
+@keyframes timerWarn {
+  0%, 100% { color: var(--health-red); text-shadow: 0 0 10px rgba(255, 51, 51, 0.5), 2px 2px 0 rgba(0,0,0,0.5); }
+  50%       { color: #ff6b6b; text-shadow: 0 0 25px rgba(255, 51, 51, 1), 2px 2px 0 rgba(0,0,0,0.5); }
+}
+.timer-warn {
+  animation: timerWarn 0.5s ease-in-out infinite;
+}
+
+/* ===========================================================
+   CHAT — Slide-in animation
+   =========================================================== */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.chat-message {
+  animation: slideIn 0.2s ease-out;
+}
+
+.chat-system {
+  background: rgba(85, 255, 85, 0.1);
+  border: 2px solid rgba(85, 255, 85, 0.3);
+  padding: 6px 12px;
+  color: var(--rare-green);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(85, 255, 85, 0.5);
+  border-radius: 0;
+}
+
+/* ===========================================================
+   WORD HINT — Letter tiles
+   =========================================================== */
+.word-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  color: var(--text);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ===========================================================
+   PLAYER ROW — Lobby & Scoreboard
+   =========================================================== */
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s, box-shadow 0.2s;
+  border-radius: 0;
+}
+.player-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.15);
+}
+.player-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  border-radius: 0;
+  border: 2px solid;
+  image-rendering: pixelated;
+}
+
+/* ===========================================================
+   WORD CARDS — Word selection
+   =========================================================== */
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.word-card {
+  background: var(--surface-2);
+  border: var(--px) solid rgba(168, 85, 247, 0.3);
+  padding: 20px 28px;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+  animation: cardAppear 0.3s ease-out both;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
+}
+.word-card:hover {
+  border-color: var(--purple);
+  box-shadow:
+    0 0 25px rgba(168, 85, 247, 0.5),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.12),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.02);
+}
+.word-card:nth-child(2) { animation-delay: 0.08s; }
+.word-card:nth-child(3) { animation-delay: 0.16s; }
+
+/* ===========================================================
+   LEADERBOARD ROW
+   =========================================================== */
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
+  border-radius: 0;
+}
+.leaderboard-row.is-drawer {
+  background: rgba(168, 85, 247, 0.12);
+  border: 2px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+}
+.leaderboard-row.guessed {
+  background: rgba(85, 255, 85, 0.08);
+  border: 1px solid rgba(85, 255, 85, 0.2);
+}
+
+/* ===========================================================
+   MODAL OVERLAY — Game overlay
+   =========================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-box {
+  background: var(--surface-2);
+  border: var(--px) solid rgba(168, 85, 247, 0.4);
+  padding: 36px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.08),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.4),
+    0 0 50px rgba(168, 85, 247, 0.25),
+    0 0 100px rgba(168, 85, 247, 0.1);
+  border-radius: 0;
+}
+
+/* ===========================================================
+   HOTBAR SLOT — Minecraft inventory style
+   =========================================================== */
+.hotbar-slot {
+  width: 36px;
+  height: 36px;
+  background: rgba(20, 20, 40, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.06),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+  border-radius: 0;
+}
+.hotbar-slot:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.1),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(168, 85, 247, 0.3);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+.hotbar-slot.active {
+  border-color: var(--xp-gold);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.5),
+    inset 1px 1px 0 rgba(255, 215, 0, 0.2),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* ===========================================================
+   LETTER TILE — Individual word hint boxes
+   =========================================================== */
+.letter-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 38px;
+  background: rgba(20, 20, 40, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  color: var(--text);
+  margin: 0 2px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.06),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+}
+.letter-tile.revealed {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+  box-shadow:
+    0 0 10px rgba(6, 182, 212, 0.3),
+    inset 1px 1px 0 rgba(6, 182, 212, 0.1);
+}
+.letter-tile.space {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  width: 16px;
+}
+
+/* ===========================================================
+   TIMER RING — SVG circular progress
+   =========================================================== */
+.timer-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timer-ring svg {
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.timer-ring-text {
+  position: absolute;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  text-shadow: 0 0 8px currentColor, 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* ===========================================================
+   RED VIGNETTE — Timer warning overlay
+   =========================================================== */
+.vignette-warn {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 0, 0, 0.2) 100%);
+  animation: vignetteFlash 0.8s ease-in-out infinite;
+}
+@keyframes vignetteFlash {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ===========================================================
+   PODIUM — Game over victory screen
+   =========================================================== */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  margin: 20px 0;
+}
+.podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--surface-1);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.06), inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+  min-width: 100px;
+}
+.podium-slot.first {
+  border-color: var(--xp-gold);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), inset 1px 1px 0 rgba(255, 215, 0, 0.1);
+  padding-bottom: 30px;
+}
+.podium-slot.second {
+  border-color: #c0c0c0;
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.2);
+  padding-bottom: 20px;
+}
+.podium-slot.third {
+  border-color: #cd7f32;
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
+  padding-bottom: 12px;
+}
+
+/* ===========================================================
+   SCREEN FLASH — Correct guess burst
+   =========================================================== */
+@keyframes screenFlash {
+  0% { opacity: 0.4; }
+  100% { opacity: 0; }
+}
+.screen-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  pointer-events: none;
+  z-index: 9990;
+  animation: screenFlash 0.15s ease-out forwards;
+}
+
+/* ===========================================================
+   21st.dev-INSPIRED KEYFRAME ANIMATIONS
+   =========================================================== */
+
+/* Breathing glow on borders/text */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3), 0 0 30px rgba(168, 85, 247, 0.1);
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(168, 85, 247, 0.6), 0 0 50px rgba(168, 85, 247, 0.2);
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.7);
+  }
+}
+
+/* Gentle floating for title/icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Screen shake for timer warning */
+@keyframes shakeWarn {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+/* Pixel fade-in — materialize effect */
+@keyframes pixelFadeIn {
+  0% { opacity: 0; filter: blur(4px) brightness(2); transform: scale(0.95); }
+  50% { filter: blur(0px) brightness(1.2); }
+  100% { opacity: 1; filter: blur(0px) brightness(1); transform: scale(1); }
+}
+
+/* Border glow cycling */
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+  33% { border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+  66% { border-color: rgba(236, 72, 153, 0.4); box-shadow: 0 0 15px rgba(236, 72, 153, 0.2); }
+}
+
+/* Typewriter dots ... */
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* Bob animation for crown / icons */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Slot appear */
+@keyframes slotAppear {
+  from { opacity: 0; transform: scale(0.8) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ===========================================================
+   SCROLLBAR — Thin pixel style
+   =========================================================== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.5);
+}
