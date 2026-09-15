@@ -165,6 +165,15 @@ export default function DrawingCanvas({ roomId, isDrawer, drawHistory }) {
     socket.emit('clear_canvas', { roomId });
   }
 
+  function saveCanvas() {
+    const canvas = canvasRef.current;
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `neon-sketch-${Date.now()}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
+
   function selectColor(hex) {
     colorRef.current = hex;
     setActiveColor(hex);
@@ -314,6 +323,18 @@ export default function DrawingCanvas({ roomId, isDrawer, drawHistory }) {
             style={{ width: '36px', height: '36px', fontSize: '16px' }}
           >
             💥
+          </button>
+
+          {/* Divider */}
+          <div style={{ width: '2px', height: '36px', background: 'rgba(255, 255, 255, 0.08)', flexShrink: 0 }} />
+
+          <button
+            className="hotbar-slot"
+            onClick={saveCanvas}
+            title="Save Drawing"
+            style={{ width: '36px', height: '36px', fontSize: '16px' }}
+          >
+            💾
           </button>
         </div>
       )}

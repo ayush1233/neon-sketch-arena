@@ -63,7 +63,17 @@ function nextTurn(roomId) {
   }
 
   room.currentDrawer = playerIds[nextIndex];
-  room.wordOptions = getRandom(3);
+
+  if (room.customWords && room.customWords.length > 0) {
+    const shuffled = [...room.customWords].sort(() => Math.random() - 0.5);
+    room.wordOptions = shuffled.slice(0, 3);
+    if (room.wordOptions.length < 3) {
+      // pad with standard words if they didn't provide at least 3 custom words
+      room.wordOptions.push(...getRandom(3 - room.wordOptions.length));
+    }
+  } else {
+    room.wordOptions = getRandom(3);
+  }
 
   broadcastRoom(roomId);
 
@@ -147,9 +157,13 @@ io.on('connection', (socket) => {
     broadcastRoom(roomId);
   });
 
-  socket.on('start_game', ({ roomId }) => {
+  socket.on('start_game', ({ roomId, customWords }) => {
     const room = getRoom(roomId);
     if (!room || room.host !== socket.id || room.players.size < 1) return;
+
+    if (customWords) {
+      room.customWords = customWords.split(',').map(w => w.trim()).filter(w => w.length > 0);
+    }
 
     room.phase = 'playing';
     room.round = 0;

@@ -5,6 +5,7 @@ export default function LandingPage() {
   const [mode, setMode] = useState(null); // null | 'create' | 'join'
   const [createName, setCreateName] = useState('');
   const [joinName, setJoinName] = useState('');
+  const [avatar, setAvatar] = useState('👽');
   const [roomCode, setRoomCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function LandingPage() {
     setError('');
     setLoading(true);
     connect(() => {
-      socket.emit('create_room', { playerName: createName.trim() });
+      socket.emit('create_room', { playerName: createName.trim(), avatar });
     });
   }
 
@@ -35,7 +36,7 @@ export default function LandingPage() {
     setError('');
     setLoading(true);
     connect(() => {
-      socket.emit('join_room', { roomId: roomCode.trim().toUpperCase(), playerName: joinName.trim() });
+      socket.emit('join_room', { roomId: roomCode.trim().toUpperCase(), playerName: joinName.trim(), avatar });
     });
   }
 
@@ -159,15 +160,30 @@ export default function LandingPage() {
                       <label className="game-label" style={{ display: 'block', marginBottom: '6px' }}>
                         YOUR NAME
                       </label>
-                      <input
-                        className="input"
-                        type="text"
-                        placeholder="Enter nickname..."
-                        maxLength={20}
-                        value={createName}
-                        onChange={e => setCreateName(e.target.value)}
-                        autoFocus
-                      />
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <select 
+                          value={avatar}
+                          onChange={e => setAvatar(e.target.value)}
+                          className="input"
+                          style={{ width: '60px', padding: '0', textAlign: 'center', fontSize: '24px' }}
+                        >
+                          <option value="👽">👽</option>
+                          <option value="👻">👻</option>
+                          <option value="🤖">🤖</option>
+                          <option value="👾">👾</option>
+                          <option value="🤡">🤡</option>
+                        </select>
+                        <input
+                          className="input"
+                          type="text"
+                          placeholder="Enter nickname..."
+                          maxLength={20}
+                          value={createName}
+                          onChange={e => setCreateName(e.target.value)}
+                          autoFocus
+                          style={{ flex: 1 }}
+                        />
+                      </div>
                     </div>
                     <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: '14px' }}>
                       {loading ? 'CREATING...' : '🚀 CREATE'}

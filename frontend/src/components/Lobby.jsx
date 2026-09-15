@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import socket from '../socket';
 
 // avatar color pool
@@ -12,9 +13,10 @@ function getColor(name) {
 export default function Lobby({ room, myId }) {
   const isHost = room.host === myId;
   const maxSlots = room.settings.maxPlayers;
+  const [customWords, setCustomWords] = useState('');
 
   function start() {
-    socket.emit('start_game', { roomId: room.id });
+    socket.emit('start_game', { roomId: room.id, customWords: customWords.trim() });
   }
 
   function copyCode() {
@@ -244,6 +246,27 @@ export default function Lobby({ room, myId }) {
         {/* ===== WAITING / START ===== */}
         {isHost ? (
           <>
+            <div style={{ marginBottom: '16px' }}>
+              <label className="game-label" style={{ display: 'block', marginBottom: '8px', textAlign: 'center' }}>
+                CUSTOM WORDS (OPTIONAL, COMMA-SEPARATED)
+              </label>
+              <textarea
+                value={customWords}
+                onChange={(e) => setCustomWords(e.target.value)}
+                placeholder="e.g. naruto, sasuke, rasengan, pokemon..."
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: 'var(--surface-1)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  fontFamily: "'Outfit', sans-serif",
+                  fontSize: '14px',
+                  resize: 'none',
+                  minHeight: '60px',
+                }}
+              />
+            </div>
             <button
               className="pixel-btn pixel-btn-primary"
               style={{
