@@ -904,3 +904,16 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(168, 85, 247, 0.5);
 }
+
+
+/* ===========================================================
+   MOBILE RESPONSIVENESS
+   =========================================================== */
+@media (max-width: 900px) {
+  .game-layout { flex-direction: column !important; overflow: auto !important; }
+  .leaderboard-panel, .chat-panel { width: 100% !important; flex: none !important; border-right: none !important; border-left: none !important; max-height: 250px !important; }
+  .chat-panel { border-top: 3px solid rgba(255, 255, 255, 0.06) !important; }
+  .leaderboard-panel { border-bottom: 3px solid rgba(255, 255, 255, 0.06) !important; }
+  .top-hud { flex-wrap: wrap !important; }
+}
+

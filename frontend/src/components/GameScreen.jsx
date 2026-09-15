@@ -189,7 +189,7 @@ export default function GameScreen({ room, myId, wordOptions, setWordOptions }) 
       )}
 
       {/* ===== TOP HUD BAR ===== */}
-      <div style={{
+      <div className="top-hud" style={{
         display: 'flex',
         alignItems: 'center',
         gap: '16px',
@@ -270,10 +270,10 @@ export default function GameScreen({ room, myId, wordOptions, setWordOptions }) 
       </div>
 
       {/* ===== MAIN GAME AREA ===== */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
+      <div className="game-layout" style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
 
         {/* LEFT: LEADERBOARD */}
-        <div style={{
+        <div className="leaderboard-panel" style={{
           width: '200px',
           flexShrink: 0,
           padding: '12px',
@@ -352,7 +352,7 @@ export default function GameScreen({ room, myId, wordOptions, setWordOptions }) 
         </div>
 
         {/* CENTER: CANVAS */}
-        <div style={{ flex: 1, padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'auto', minWidth: 0 }}>
+        <div className="canvas-panel" style={{ flex: 1, padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', overflow: 'auto', minWidth: 0 }}>
           {/* Word selection overlay */}
           {room.phase === 'choosing' && room.currentDrawer === myId && wordOptions && (
             <div className="modal-overlay">
@@ -408,7 +408,7 @@ export default function GameScreen({ room, myId, wordOptions, setWordOptions }) 
         </div>
 
         {/* RIGHT: CHAT */}
-        <div style={{
+        <div className="chat-panel" style={{
           width: '260px',
           flexShrink: 0,
           display: 'flex',
