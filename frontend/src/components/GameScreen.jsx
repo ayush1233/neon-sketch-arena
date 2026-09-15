@@ -179,7 +179,8 @@ export default function GameScreen({ room, myId, wordOptions, setWordOptions }) 
   const drawerName = room.players.find(p => p.id === room.currentDrawer)?.name || '?';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg-deep)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden', background: 'var(--bg-deep)' }}>
+      {/* ===== OVERLAYS ===== */}
       <Confetti trigger={confettiTrigger} />
       {showFlash && <div className="screen-flash" />}
 

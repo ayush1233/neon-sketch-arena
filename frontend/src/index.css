@@ -917,3 +917,6 @@ button {
   .top-hud { flex-wrap: wrap !important; }
 }
 
+
+body { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; overscroll-behavior: none; }
+
