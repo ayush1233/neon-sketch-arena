@@ -18,7 +18,7 @@ Built as an end-to-end web application featuring live canvas synchronization, So
 
 ---
 
-## 🎮 Features (Assignment Requirements Met)
+## 🎮 Features
 
 ### Core Requirements
 * ✅ **Multiplayer Rooms:** Host and join private or public rooms. Configurable max players, rounds, and draw time.
