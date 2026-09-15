@@ -13,11 +13,19 @@ export default function App() {
   const [wordOptions, setWordOptions] = useState(null);
 
   useEffect(() => {
-    socket.on('connect', () => setMyId(socket.id));
+    socket.on('connect', () => {
+      setMyId(socket.id);
+      // If we had a room but recovery failed, we must start over
+      if (!socket.recovered && room) {
+        setView('landing');
+        setRoom(null);
+        alert('Connection lost. Please rejoin the room.');
+      }
+    });
+
     socket.on('disconnect', () => {
-      setView('landing');
-      setRoom(null);
-      setMyId(null);
+      // Do not wipe state immediately; wait for connectionStateRecovery to attempt reconnect
+      console.log('Socket disconnected. Waiting for recovery...');
     });
 
     socket.on('room_created', ({ roomId }) => {

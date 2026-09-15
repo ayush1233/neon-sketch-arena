@@ -10,6 +10,10 @@ app.use(express.json());
 
 const server = http.createServer(app);
 const io = new Server(server, {
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: true,
+  },
   cors: { origin: '*' },
 });
 
