@@ -18,15 +18,20 @@ Built as an end-to-end web application featuring live canvas synchronization, So
 
 ---
 
-## 🎮 Features
+## 🎮 Features (Assignment Requirements Met)
 
-* **Multiplayer Rooms:** Host and join private or public rooms.
-* **Real-time Canvas Sync:** 1-to-1 stroke broadcasting so everyone sees drawing instantly.
-* **Turn-Based Gameplay:** Rotate drawer and guessers each round.
-* **Word System:** Drawer picks a word; guessers attempt to guess in the chat.
-* **Scoring System:** Points awarded for correct guesses based on time. Leaderboard shown at game end.
-* **Chat System:** General chat + correct guess notifications.
-* **Drawing Tools:** Brush size, color picker, eraser, undo, and clear canvas.
+### Core Requirements
+* ✅ **Multiplayer Rooms:** Host and join private or public rooms. Configurable max players, rounds, and draw time.
+* ✅ **Turn-Based Gameplay:** Rotate drawer and guessers each round seamlessly.
+* ✅ **Real-time Canvas Sync:** 1-to-1 stroke broadcasting so everyone sees drawing instantly via WebSockets.
+* ✅ **Word System:** Drawer picks 1 of 3 words; guessers see blank tile hints and attempt to guess in the chat.
+* ✅ **Scoring System:** Points awarded for correct guesses based on time. Leaderboard shown at game end.
+* ✅ **WebSockets:** Real-time sync for drawing, guesses, chat, and game state.
+
+### Drawing Tools & UX
+* ✅ **Complete Toolset:** Brush size, color picker, eraser, undo, and clear canvas (TNT).
+* ✅ **Mobile Support:** Touch-screen drawing support (`onTouchMove`) with a fully responsive layout that stacks on mobile devices.
+* ✅ **Chat System:** General chat + correct guess notifications that filter out the answer.
 
 ---
 
