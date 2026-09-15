@@ -18,27 +18,11 @@ const path = require('path');
 // simple health check so the frontend can ping before connecting
 app.get('/health', (_, res) => res.json({ ok: true }));
 
-// Serve static frontend files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-  });
-} else {
-  app.get('/', (_, res) => {
-    res.send(`
-      <div style="font-family: system-ui, sans-serif; text-align: center; padding: 50px; background: #0f172a; color: #f8fafc; height: 100vh; box-sizing: border-box;">
-        <h1 style="color: #a855f7;">🎮 Neon Sketch Arena Backend Server</h1>
-        <p style="font-size: 1.2rem; color: #94a3b8;">This is the Socket.IO & Express API backend running on port 3001.</p>
-        <p style="font-size: 1.2rem; margin-top: 30px;">
-          To open the interactive web app game UI, visit:
-          <br/><br/>
-          <a href="http://localhost:5173" style="color: #06b6d4; font-size: 1.5rem; font-weight: bold; background: rgba(6,182,212,0.1); padding: 12px 24px; border-radius: 8px; text-decoration: none; border: 1px solid #06b6d4;">👉 http://localhost:5173 👈</a>
-        </p>
-      </div>
-    `);
-  });
-}
+// Always serve static frontend files
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
 
 // ---- helpers ----
 

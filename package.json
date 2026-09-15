@@ -2,9 +2,9 @@
   "name": "neon-sketch-arena-root",
   "version": "1.0.0",
   "scripts": {
-    "install": "cd frontend && npm install && cd ../backend && npm install",
+    "postinstall": "cd backend && npm install --omit=dev",
     "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+    "start": "node backend/index.js"
   },
   "engines": {
     "node": ">=18.0.0"
